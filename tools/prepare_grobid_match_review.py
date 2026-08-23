@@ -54,7 +54,7 @@ fix the upstream human Gold/claim review, regenerate this package, and do not
 force a strict score through unresolved ontology errors.
 """
     manifest = {
-        "contract_version": "paperwright-grobid-match-review-package-v0.1",
+        "contract_version": "paperwright-grobid-match-review-package-v0.2",
         "document_id": match_task["document_id"],
         "match_task": {
             "path": "match-task.json",

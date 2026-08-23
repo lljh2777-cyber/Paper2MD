@@ -75,6 +75,6 @@ g07-diabetic-sudden-deafness.human-review.json
 
 当前只有 `g07` 完成人工标注。v0.2 修复了 recall 分母的跨页守恒；后续的可审计
 claim↔Gold 匹配和严格评分门见
-[`GROBID_MATCH_SCORING_V0.1.md`](GROBID_MATCH_SCORING_V0.1.md)。首次守恒审计发现
-`g07` 的 Gold 漏列五个已被标为 correct 的结构化摘要标题，因此评分器按设计阻塞，尚未
-发布 strict recall。
+[`GROBID_MATCH_SCORING_V0.2.md`](GROBID_MATCH_SCORING_V0.2.md)。首次守恒审计发现
+`g07` 的 Gold 漏列五个已被标为 correct 的结构化摘要标题；在明确确认它们属于
+section-heading Gold 后，原响应保持不变，修正版另行保存并完成首个严格试算。

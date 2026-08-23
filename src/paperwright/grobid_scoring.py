@@ -20,8 +20,12 @@ from .grobid_human_review import (
 )
 
 GROBID_MATCH_TASK_VERSION = "paperwright-grobid-gold-match-task-v0.1"
-GROBID_MATCH_REVIEW_VERSION = "paperwright-grobid-gold-match-review-v0.1"
-GROBID_SEMANTIC_SCORE_VERSION = "paperwright-grobid-semantic-score-v0.1"
+GROBID_MATCH_REVIEW_LEGACY_VERSION = (
+    "paperwright-grobid-gold-match-review-v0.1"
+)
+GROBID_MATCH_REVIEW_VERSION = "paperwright-grobid-gold-match-review-v0.2"
+GROBID_SEMANTIC_SCORE_VERSION = "paperwright-grobid-semantic-score-v0.2"
+ADJUDICATION_KINDS = ("human", "ai", "mixed")
 MATCH_DECISIONS = ("matched", "missed", "uncertain")
 ORPHAN_DISPOSITIONS = (
     "out_of_scope",
@@ -334,6 +338,7 @@ def build_grobid_match_review_template(
         "match_task_sha256": grobid_match_task_sha256(match_task),
         "document_id": match_task["document_id"],
         "reviewer": "",
+        "adjudication_kind": "human",
         "gold_adjudications": gold,
         "orphan_adjudications": orphan,
         "completion": {
@@ -364,13 +369,20 @@ def validate_grobid_match_review(
     ):
         _fail("GROBID match task 顶层字段非法")
     if (
-        response.get("contract_version") != GROBID_MATCH_REVIEW_VERSION
+        response.get("contract_version")
+        not in {
+            GROBID_MATCH_REVIEW_LEGACY_VERSION,
+            GROBID_MATCH_REVIEW_VERSION,
+        }
         or response.get("match_task_sha256")
         != grobid_match_task_sha256(match_task)
         or response.get("document_id") != match_task.get("document_id")
         or not isinstance(response.get("reviewer"), str)
     ):
         _fail("GROBID match review 与 task 绑定不匹配")
+    if response.get("contract_version") == GROBID_MATCH_REVIEW_VERSION:
+        if response.get("adjudication_kind") not in ADJUDICATION_KINDS:
+            _fail("GROBID match review adjudication_kind 非法")
     review_gold = [
         item
         for item in match_task["gold_units"]
@@ -589,6 +601,7 @@ def score_grobid_human_review(
     adjudication_by_gold = {
         item["gold_unit_id"]: item for item in match_review["gold_adjudications"]
     }
+    adjudication_kind = match_review.get("adjudication_kind", "human")
     recall_by_type = {}
     recall_matched = recall_denominator = 0
     match_records = []
@@ -608,7 +621,7 @@ def score_grobid_human_review(
                 adjudication = adjudication_by_gold[unit["gold_unit_id"]]
                 decision = adjudication["decision"]
                 claim_ids = adjudication["claim_ids"]
-                source = "human"
+                source = f"{adjudication_kind}_adjudication"
             matched += decision == "matched"
             match_records.append(
                 {
@@ -647,6 +660,7 @@ def score_grobid_human_review(
         "match_review_sha256": _sha256(match_review),
         "semantic_accuracy_measured": True,
         "scope": "single_document",
+        "adjudication_kind": adjudication_kind,
         "strict_precision": {
             "micro": _rate(precision_correct, precision_denominator),
             "document_type_macro": (
@@ -670,8 +684,10 @@ def score_grobid_human_review(
 
 
 __all__ = [
+    "ADJUDICATION_KINDS",
     "BLOCKING_ORPHAN_DISPOSITIONS",
     "GROBID_MATCH_REVIEW_VERSION",
+    "GROBID_MATCH_REVIEW_LEGACY_VERSION",
     "GROBID_MATCH_TASK_VERSION",
     "GROBID_SEMANTIC_SCORE_VERSION",
     "MATCH_DECISIONS",

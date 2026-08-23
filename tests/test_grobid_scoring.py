@@ -1,4 +1,5 @@
 import unittest
+from copy import deepcopy
 
 from paperwright.exceptions import ContractValidationError
 from paperwright.grobid_evaluation import GROBID_AUDIT_TASK_VERSION
@@ -9,6 +10,7 @@ from paperwright.grobid_human_review import (
     validate_grobid_human_review,
 )
 from paperwright.grobid_scoring import (
+    GROBID_MATCH_REVIEW_LEGACY_VERSION,
     build_grobid_match_review_template,
     build_grobid_match_task,
     render_grobid_match_review_html,
@@ -192,12 +194,23 @@ class GrobidSemanticScoringTests(unittest.TestCase):
         self.assertIn("Gold units requiring adjudication", rendered)
         self.assertNotIn("paper-recipe", rendered)
 
+        legacy = deepcopy(response)
+        legacy["contract_version"] = GROBID_MATCH_REVIEW_LEGACY_VERSION
+        legacy.pop("adjudication_kind")
+        validate_grobid_match_review(match_task, legacy)
+
+        invalid_kind = deepcopy(response)
+        invalid_kind["adjudication_kind"] = "unattributed"
+        with self.assertRaisesRegex(ContractValidationError, "adjudication_kind"):
+            validate_grobid_match_review(match_task, invalid_kind)
+
     def test_blocks_gold_omission_then_scores_resolved_review(self):
         audit_task = self._audit_task()
         human_review = self._human_review(audit_task)
         match_task = build_grobid_match_task(audit_task, human_review)
         response = build_grobid_match_review_template(match_task)
         response["reviewer"] = "Adjudicator"
+        response["adjudication_kind"] = "ai"
         response["gold_adjudications"][0].update(
             {
                 "decision": "matched",
@@ -238,6 +251,7 @@ class GrobidSemanticScoringTests(unittest.TestCase):
             audit_task, human_review, match_task, response
         )
         self.assertTrue(score["semantic_accuracy_measured"])
+        self.assertEqual(score["adjudication_kind"], "ai")
         self.assertEqual(score["strict_recall"]["micro"], 0.5)
         self.assertEqual(score["strict_precision"]["micro"], 0.714286)
         self.assertEqual(
@@ -246,6 +260,12 @@ class GrobidSemanticScoringTests(unittest.TestCase):
             ],
             1,
         )
+        abstract_match = next(
+            item
+            for item in score["gold_matches"]
+            if item["claim_type"] == "abstract"
+        )
+        self.assertEqual(abstract_match["decision_source"], "ai_adjudication")
 
     def test_rejects_reusing_automatic_match_claim(self):
         audit_task = self._audit_task()

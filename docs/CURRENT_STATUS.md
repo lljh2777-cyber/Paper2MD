@@ -164,13 +164,15 @@ Docling 只处理局部冲突；各 provider 的观察、主张和最终决定�
     分母守恒，并新增显式迁移/合并工具。`g07` 的 141 条标签已无损迁移并严格验证；摘要
     为 1 unit/2 segments，参考文献为 24 units/25 segments。该提交当时尚未建立
     claim↔Gold 显式匹配，后续状态见第 41 项。
-41. GROBID claim↔Gold 守恒评分门：新增哈希绑定的 match task/review/score 三个契约；
+41. GROBID claim↔Gold 守恒评分门与首个严格试算：新增哈希绑定的 match task/review/score
+    三个契约；
     唯一规范化文字+页面交集自动匹配，无同类型 correct claim 自动 missed，其余情况由离线
     页面显式裁决；正确 claim 不得复用，Gold omission、claim label error 和 uncertain 会
-    阻塞评分。`g07` 得到 17 个自动匹配、30 个自动 missed、2 个未决 Gold，并暴露五个
-    已标 correct 的结构化摘要标题未进入 Gold。当前保持阻塞且不发布 strict 指标，先修复
-    并重新签署上游 Gold。详见
-    [GROBID_MATCH_SCORING_V0.1](GROBID_MATCH_SCORING_V0.1.md)。
+    阻塞评分。`g07` 首次检查暴露五个已标 correct 的结构化摘要标题未进入 Gold；明确
+    口径后保留原响应并生成修正版，得到 22 个自动匹配、30 个自动 missed 和 2 个 AI
+    裁决项。review/score v0.2 显式区分 human/AI/mixed 来源；首个单文档 strict precision
+    micro 为 60.28%，strict recall micro 为 42.59%，只作链路验通与失败族诊断。详见
+    [GROBID_MATCH_SCORING_V0.2](GROBID_MATCH_SCORING_V0.2.md)。
 
 ## 当前主链
 
@@ -244,9 +246,8 @@ final ArticleTree v0.2 的规范上游迁移均已完成。GROBID HTTP 集成已
 7/8 对；机器结果见
 [GROBID 科研语义证据评估 v0.1 机器结果](GROBID_SEMANTIC_EVAL_V0.1_RESULTS.md)。盲化
 [人工 gold 工作台 v0.2](GROBID_HUMAN_REVIEW_V0.2.md)也已生成，且首篇 `g07` 已完成。
-[claim↔Gold 匹配与严格评分门](GROBID_MATCH_SCORING_V0.1.md)已经实现；首次守恒检查发现
-五个结构化摘要标题的 Gold omission，因此下一步先修复并重新签署 `g07` Gold，再完成两项
-剩余匹配裁决和严格试算。之后继续其余 6 份 response，逐类
+[claim↔Gold 匹配与严格评分门](GROBID_MATCH_SCORING_V0.2.md)已经实现，`g07` Gold
+本体冲突已经显式修正并完成首个严格试算。下一步继续其余 6 份 response，逐类
 测量 front matter、摘要、章节、caption、引用和参考文献
 的严格 precision/recall 与 ArticleTree 决策贡献。同时测量首页家具排除、Table
 图片回退和原生 Figure 补全的误伤/漏召回，据此决定哪些 E5 baseline 动作可以保留、收紧

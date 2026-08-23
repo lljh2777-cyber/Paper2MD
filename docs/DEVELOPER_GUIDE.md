@@ -147,8 +147,9 @@ python tools/run_install_checks.py --repo . --output-root /tmp/pw-install-check 
   `tools/validate_grobid_human_review.py` 校验 task-bound 人工 response；
   `paperwright.grobid_scoring` 确定性重算 claim↔Gold 匹配、守恒 orphan correct claims，
   `tools/prepare_grobid_match_review.py`/`validate_grobid_match_review.py` 提供离线裁决和阻塞门，
+  match-review/score v0.2 显式保存 `human/ai/mixed` 裁决来源；
   `tools/score_grobid_human_review.py` 只在完整且无 Gold/标签冲突时输出 strict
-  precision/recall
+  precision/recall（旧 match-review v0.1 仍可读）
 
 未完成：
 
