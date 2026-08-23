@@ -1,6 +1,6 @@
 # PaperWright 当前实现状态
 
-更新时间：2026-08-22。
+更新时间：2026-08-23。
 
 ## 产品边界
 
@@ -162,8 +162,15 @@ Docling 只处理局部冲突；各 provider 的观察、主张和最终决定�
 40. GROBID 多页 gold 单元：人工 `g07` 暴露出 v0.1 会把跨页摘要/参考文献拆成两个 recall
     单元；response/manifest 升级到 v0.2，以一个 semantic unit 下的多个 page segments 保持
     分母守恒，并新增显式迁移/合并工具。`g07` 的 141 条标签已无损迁移并严格验证；摘要
-    为 1 unit/2 segments，参考文献为 24 units/25 segments。尚未建立 claim↔gold 显式匹配，
-    因此仍不发布 strict recall。
+    为 1 unit/2 segments，参考文献为 24 units/25 segments。该提交当时尚未建立
+    claim↔Gold 显式匹配，后续状态见第 41 项。
+41. GROBID claim↔Gold 守恒评分门：新增哈希绑定的 match task/review/score 三个契约；
+    唯一规范化文字+页面交集自动匹配，无同类型 correct claim 自动 missed，其余情况由离线
+    页面显式裁决；正确 claim 不得复用，Gold omission、claim label error 和 uncertain 会
+    阻塞评分。`g07` 得到 17 个自动匹配、30 个自动 missed、2 个未决 Gold，并暴露五个
+    已标 correct 的结构化摘要标题未进入 Gold。当前保持阻塞且不发布 strict 指标，先修复
+    并重新签署上游 Gold。详见
+    [GROBID_MATCH_SCORING_V0.1](GROBID_MATCH_SCORING_V0.1.md)。
 
 ## 当前主链
 
@@ -236,8 +243,10 @@ final ArticleTree v0.2 的规范上游迁移均已完成。GROBID HTTP 集成已
 顺序取位置 65–72，冻结前没有运行 PaperWright/GROBID 或查看页面标签。冻结批次现已完成
 7/8 对；机器结果见
 [GROBID 科研语义证据评估 v0.1 机器结果](GROBID_SEMANTIC_EVAL_V0.1_RESULTS.md)。盲化
-[人工 gold 工作台 v0.2](GROBID_HUMAN_REVIEW_V0.2.md)也已生成，且首篇 `g07` 已完成；下一步
-建立 claim↔gold 匹配并试算 `g07`，再继续其余 6 份 response，逐类
+[人工 gold 工作台 v0.2](GROBID_HUMAN_REVIEW_V0.2.md)也已生成，且首篇 `g07` 已完成。
+[claim↔Gold 匹配与严格评分门](GROBID_MATCH_SCORING_V0.1.md)已经实现；首次守恒检查发现
+五个结构化摘要标题的 Gold omission，因此下一步先修复并重新签署 `g07` Gold，再完成两项
+剩余匹配裁决和严格试算。之后继续其余 6 份 response，逐类
 测量 front matter、摘要、章节、caption、引用和参考文献
 的严格 precision/recall 与 ArticleTree 决策贡献。同时测量首页家具排除、Table
 图片回退和原生 Figure 补全的误伤/漏召回，据此决定哪些 E5 baseline 动作可以保留、收紧

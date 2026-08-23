@@ -82,5 +82,9 @@ GROBID 改善了 Markdown，也不能将任何 claim type 升级为确定性采�
 盲化人工审计工具和 7 份 task-bound 空白 response 已生成，见
 [GROBID 人工 Gold 审计 v0.2](GROBID_HUMAN_REVIEW_V0.2.md)。v0.2 将跨页语义单元表示为
 一个 unit 下的多个 page segments，避免错误增大 recall 分母。`g07` 已完成逐 claim 标注和
-全文 gold 枚举，其余 6 篇尚待处理。建立可审计的 claim↔gold 匹配并得到严格
-precision/recall 后，再决定哪些 GROBID claims 只用于路由、哪些能进入受限 Recipe 动作。
+全文 gold 枚举，其余 6 篇尚待处理。claim↔Gold 的确定性匹配、人工裁决和严格评分门已经
+实现，见 [`GROBID_MATCH_SCORING_V0.1.md`](GROBID_MATCH_SCORING_V0.1.md)。`g07`
+重算得到 17 个自动匹配、30 个自动 missed 和 2 个需人工判断的 Gold；同时发现 Gold 漏列
+五个已标 correct 的结构化摘要标题。该本体冲突按契约阻塞评分，所以本报告仍维持
+`semantic_accuracy_measured=false`。修复并重新签署上游 Gold 后，才能发布 strict
+precision/recall，再决定哪些 GROBID claims 只用于路由、哪些能进入受限 Recipe 动作。

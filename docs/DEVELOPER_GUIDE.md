@@ -144,7 +144,11 @@ python tools/run_install_checks.py --repo . --output-root /tmp/pw-install-check 
   `tools/summarize_grobid_semantic_eval.py` 可从不可变 run 重算 micro/document-macro 汇总且
   拒绝覆盖；`tools/prepare_grobid_human_review.py` 生成无依赖盲审页面，
   `tools/migrate_grobid_human_review.py` 将 v0.1 单页 gold 迁移为 v0.2 多片段单元，
-  `tools/validate_grobid_human_review.py` 校验 task-bound 人工 response
+  `tools/validate_grobid_human_review.py` 校验 task-bound 人工 response；
+  `paperwright.grobid_scoring` 确定性重算 claim↔Gold 匹配、守恒 orphan correct claims，
+  `tools/prepare_grobid_match_review.py`/`validate_grobid_match_review.py` 提供离线裁决和阻塞门，
+  `tools/score_grobid_human_review.py` 只在完整且无 Gold/标签冲突时输出 strict
+  precision/recall
 
 未完成：
 

@@ -402,6 +402,7 @@ python -m paperwright convert input.pdf output-dir
 - [GROBID 科研语义证据评估 v0.1 冻结语料](docs/GROBID_SEMANTIC_EVAL_V0.1_CORPUS.md)
 - [GROBID 科研语义证据评估 v0.1 机器结果](docs/GROBID_SEMANTIC_EVAL_V0.1_RESULTS.md)
 - [GROBID 人工 Gold 审计 v0.2](docs/GROBID_HUMAN_REVIEW_V0.2.md)
+- [GROBID claim↔Gold 匹配与严格评分 v0.1](docs/GROBID_MATCH_SCORING_V0.1.md)
 - [架构](docs/ARCHITECTURE.md)
 - [粗提取多证据架构 v0.1](docs/EXTRACTION_ENSEMBLE_V0.1.md)
 - [PaperRecipe 与 ArticleTree v0.1](docs/PAPER_RECIPE_ARTICLE_TREE_V0.1.md)
